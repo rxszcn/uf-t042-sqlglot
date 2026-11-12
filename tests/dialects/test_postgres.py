@@ -1053,6 +1053,38 @@ FROM json_data, field_ids""",
             },
         )
         self.validate_all(
+            "GENERATE_SERIES(1, 10, '2')",
+            write={
+                "bigquery": "GENERATE_ARRAY(1, 10, '2')",
+                "duckdb": "UNNEST(GENERATE_SERIES(1, 10, '2'))",
+                "postgres": "GENERATE_SERIES(1, 10, '2')",
+                "presto": "UNNEST(SEQUENCE(1, 10, '2'))",
+                "spark": "EXPLODE(SEQUENCE(1, 10, '2'))",
+                "trino": "UNNEST(SEQUENCE(1, 10, '2'))",
+            },
+        )
+        self.validate_all(
+            "GENERATE_SERIES('2020-01-01'::DATE, '2020-12-31'::DATE, '1 year 2 months')",
+            write={
+                "postgres": "GENERATE_SERIES(CAST('2020-01-01' AS DATE), CAST('2020-12-31' AS DATE), INTERVAL '1 year 2 months')",
+                "presto": "UNNEST(SEQUENCE(CAST('2020-01-01' AS DATE), CAST('2020-12-31' AS DATE), INTERVAL '1 year 2 months'))",
+            },
+        )
+        self.validate_all(
+            "GENERATE_SERIES('2020-01-01'::DATE, '2020-12-31'::DATE, INTERVAL '1 year 2 months')",
+            write={
+                "postgres": "GENERATE_SERIES(CAST('2020-01-01' AS DATE), CAST('2020-12-31' AS DATE), INTERVAL '1 year 2 months')",
+                "presto": "UNNEST(SEQUENCE(CAST('2020-01-01' AS DATE), CAST('2020-12-31' AS DATE), INTERVAL '1 year 2 months'))",
+            },
+        )
+        self.validate_all(
+            "GENERATE_SERIES('2020-01-01'::DATE, '2020-12-31'::DATE, '1 day 2 hours')",
+            write={
+                "postgres": "GENERATE_SERIES(CAST('2020-01-01' AS DATE), CAST('2020-12-31' AS DATE), INTERVAL '1 day 2 hours')",
+                "presto": "UNNEST(SEQUENCE(CAST('2020-01-01' AS DATE), CAST('2020-12-31' AS DATE), INTERVAL '1 day 2 hours'))",
+            },
+        )
+        self.validate_all(
             "GENERATE_SERIES('2019-01-01'::TIMESTAMP, NOW(), '1day')",
             write={
                 "databricks": "EXPLODE(SEQUENCE(CAST('2019-01-01' AS TIMESTAMP), CAST(CURRENT_TIMESTAMP() AS TIMESTAMP), INTERVAL '1' DAY))",
